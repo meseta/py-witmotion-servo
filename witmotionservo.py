@@ -1,12 +1,12 @@
 """ Driver for the Witmotion 16-channel servo board """
 
+from __future__ import annotations
 import time
 from typing import List, Union # remove at python 3.9
 import hid
 
 WITMOTION_VID = 0x1920
 WITMOTION_PID = 0x0100
-WITMOTION_CHANNELS = 16
 
 class WitmotionServo():
     """ Driver object containing controls for Witmotion 16-channel servo board """
@@ -20,19 +20,24 @@ class WitmotionServo():
         devices = hid.enumerate(WITMOTION_VID, WITMOTION_PID)
         return [device["serial_number"] for device in devices]
 
-    def __init__(self, serial: Union[None, str]=None) -> None:
+    def __init__(self, serial: Union[None, str]=None, channels: int=16) -> None:
         """ Creates the hid device object
         :param serial: Optional serial number of device to connect
+        :param channels: Optional number of channels the board has
         """
         self.device = hid.device()
         self.serial = serial
+        self.channels = channels
 
-    def open(self) -> None:
+    def open(self) -> WitmotionServo:
         """ Connects to the device
         device.open will raise IOError if it can't connect
+
+        :returns: itself, facilitating method chaining
         """
         self.device.open(WITMOTION_VID, WITMOTION_PID, self.serial)
         self.device.set_nonblocking(1)
+        return self
 
     def close(self) -> None:
         """ Closes the device """
@@ -54,15 +59,18 @@ class WitmotionServo():
 
         raise TimeoutError("Read value timed out")
 
-    def set_position(self, channel: int, value: int) -> None:
+    def set_position(self, channel: int, value: int, extended: bool=False) -> None:
         """ Sends servo position request
         :param channel: the channel of the servo to send
         :param value: the value (500-2500) to send
+        :param extended: use extended range (0, 65535) for value
         """
-        if channel < 0 or channel >= WITMOTION_CHANNELS:
-            raise ValueError(f"Channel out of range (0, {WITMOTION_CHANNELS-1})")
+        if channel < 0 or channel >= self.channels:
+            raise ValueError(f"Channel out of range (0, {self.channels-1})")
 
-        if value < 500 or value > 2500:
+        if value < 0 or value > 65535:
+            raise ValueError("Value out of extended range: (0, 65535)")
+        if not extended and (value < 500 or value > 2500):
             raise ValueError("Value out of range: (500, 2500)")
 
         datal = value & 0xff
@@ -77,13 +85,13 @@ class WitmotionServo():
         :param channel: the channel of the servo to send
         :param value: the speed value (1-20)
         """
-        if channel < 0 or channel >= WITMOTION_CHANNELS:
-            raise ValueError(f"Channel out of range (0, {WITMOTION_CHANNELS-1})")
+        if channel < 0 or channel >= self.channels:
+            raise ValueError(f"Channel out of range (0, {self.channels-1})")
 
         if value < 1 or value > 20:
             raise ValueError("Value out of range: (1, 20)")
 
-        self.device.write([1, 0x05, 0x03, 0xff, 0x02, channel, value, 0x00] + [0]*56)
+        self.device.write([1, 0x05, 0x03, 0xff, 0x01, channel, value, 0x00] + [0]*56)
 
     def execute_action_group(self, action_group: int) -> None:
         """ Executes an action group

@@ -1,4 +1,4 @@
-""" Driver for the Witmotion 16-channel servo board """
+""" Driver for Witmotion Servo Controller boards """
 
 from __future__ import annotations
 import time
@@ -9,7 +9,7 @@ WITMOTION_VID = 0x1920
 WITMOTION_PID = 0x0100
 
 class WitmotionServo():
-    """ Driver object containing controls for Witmotion 16-channel servo board """
+    """ Class for controlling Witmotion Servo Controller boards """
 
     @classmethod
     def list_devices(cls) -> List[str]:

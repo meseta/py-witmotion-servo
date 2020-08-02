@@ -20,7 +20,7 @@ class WitmotionServo():
         devices = hid.enumerate(WITMOTION_VID, WITMOTION_PID)
         return [device["serial_number"] for device in devices]
 
-    def __init__(self, serial: Union(None, str)=None) -> None:
+    def __init__(self, serial: Union[None, str]=None) -> None:
         """ Creates the hid device object
         :param serial: Optional serial number of device to connect
         """
@@ -38,7 +38,7 @@ class WitmotionServo():
         """ Closes the device """
         self.device.close()
 
-    def heartbeat(self, timeout=0.1) -> List(int):
+    def heartbeat(self, timeout: float=0.1) -> List[int]:
         """ Sends the heartbeat
         :param timeout: time to wait for response before returning
         :returns: the status value array

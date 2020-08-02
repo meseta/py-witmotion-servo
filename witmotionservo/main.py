@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import time
-from typing import List, Union # remove at python 3.9
+from typing import List, Optional # remove at python 3.9
 import hid
 
 WITMOTION_VID = 0x1920
@@ -20,7 +20,7 @@ class WitmotionServo():
         devices = hid.enumerate(WITMOTION_VID, WITMOTION_PID)
         return [device["serial_number"] for device in devices]
 
-    def __init__(self, serial: Union[None, str]=None, channels: int=16) -> None:
+    def __init__(self, serial: Optional[str]=None, channels: int=16) -> None:
         """ Creates the hid device object
         :param serial: Optional serial number of device to connect
         :param channels: Optional number of channels the board has

@@ -48,7 +48,7 @@ class WitmotionServo():
         :param timeout: time to wait for response before returning
         :returns: the status value array
         """
-        self.device.write([1, 0x05, 0x03, 0xff, 0x00, 0x12] + [0]*58)
+        self.device.write([0x05, 0x03, 0xff, 0x00, 0x12] + [0]*59)
 
         time_limit = time.time_ns() + timeout*1000000000
         while time.time_ns() < time_limit:
@@ -75,7 +75,7 @@ class WitmotionServo():
 
         datal = value & 0xff
         datah = value >> 8
-        self.device.write([1, 0x05, 0x03, 0xff, 0x02, channel, datal, datah] + [0]*56)
+        self.device.write([0x05, 0x03, 0xff, 0x02, channel, datal, datah] + [0]*57)
 
     def set_speed(self, channel: int, value: int) -> None:
         """ Sends servo position request
@@ -91,7 +91,7 @@ class WitmotionServo():
         if value < 1 or value > 20:
             raise ValueError("Value out of range: (1, 20)")
 
-        self.device.write([1, 0x05, 0x03, 0xff, 0x01, channel, value, 0x00] + [0]*56)
+        self.device.write([1, 0x05, 0x03, 0xff, 0x01, channel, value, 0x00] + [0]*57)
 
     def execute_action_group(self, action_group: int) -> None:
         """ Executes an action group
@@ -100,14 +100,14 @@ class WitmotionServo():
         if action_group < 1 or action_group > 16:
             raise ValueError("Action Group out of range (1, 16)")
 
-        self.device.write([1, 0x05, 0x03, 0xff, 0x09, 0x00, action_group, 0x00] + [0]*56)
+        self.device.write([0x05, 0x03, 0xff, 0x09, 0x00, action_group, 0x00] + [0]*57)
 
     def emergency_stop(self) -> None:
         """ Sends the emergency stop command """
 
-        self.device.write([1, 0x05, 0x03, 0xff, 0x0b, 0x00, 0x01, 0x00] + [0]*56)
+        self.device.write([0x05, 0x03, 0xff, 0x0b, 0x00, 0x01, 0x00] + [0]*57)
 
     def emergency_recovery(self) -> None:
         """ Sends the recover from emergency command """
 
-        self.device.write([1, 0x05, 0x03, 0xff, 0x0b, 0x00, 0x00, 0x00] + [0]*56)
+        self.device.write([0x05, 0x03, 0xff, 0x0b, 0x00, 0x00, 0x00] + [0]*57)
